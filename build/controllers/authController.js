@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const user_1 = __importDefault(require("../models/user"));
 const config_1 = __importDefault(require("../config"));
+const user_1 = __importDefault(require("../models/user"));
 const messages = {
     login: {
         noUserExists: "Account doesn't exists. Please register.",
@@ -29,10 +29,10 @@ const messages = {
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password, panel } = req.body;
-        const user = yield user_1.default.findOne({ email: email, password: password });
+        const user = yield user_1.default.findOne({ email: email });
         // Check User exists
         if (!user) {
-            res.status(404).send({
+            return res.status(404).send({
                 status: false,
                 message: messages.login.noUserExists,
             });
@@ -84,5 +84,77 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-module.exports = { login };
+const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, currentPassword, newPassword } = req.body;
+        const oldUser = yield user_1.default.findOne({ email: email });
+        if (!oldUser) {
+            res.status(404).json({
+                status: false,
+                message: "Account not found.",
+            });
+        }
+        console.log(oldUser);
+        const currentPasswordIsValid = bcryptjs_1.default.compareSync(currentPassword, oldUser.password);
+        if (!currentPasswordIsValid) {
+            return res.status(409).json({ status: false, message: "Current password does not match with old password." });
+        }
+        oldUser.password = bcryptjs_1.default.hashSync(newPassword);
+        yield oldUser.save();
+        res
+            .status(200)
+            .json({
+            status: true,
+            message: "Password updated successfully.",
+            data: oldUser,
+        });
+        return;
+    }
+    catch (error) {
+        res.status(400).json({
+            status: false,
+            message: error.message,
+        });
+    }
+});
+const profile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = req.user;
+        res.status(200).json({
+            status: true,
+            message: "Successfully fetched user.",
+            data: user,
+        });
+    }
+    catch (error) {
+        res
+            .status(400)
+            .json({
+            status: false,
+            message: "Something went wrong while fetching profile.",
+        });
+    }
+});
+const profileUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name, phone, address } = req.body;
+        const user = yield user_1.default.findByIdAndUpdate(req.params.id, { name, phone, address }, { new: true });
+        res
+            .status(200)
+            .json({
+            status: true,
+            message: "Account successfully updated.",
+            data: user,
+        });
+    }
+    catch (error) {
+        res
+            .status(400)
+            .json({
+            status: false,
+            message: "Something went wrong while updating account.",
+        });
+    }
+});
+module.exports = { login, changePassword, profile, profileUpdate };
 //# sourceMappingURL=authController.js.map

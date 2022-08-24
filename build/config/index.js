@@ -39,6 +39,9 @@ const config = {
         SECRET: process.env.JWT_SECRET || "lfakjfslfkaslkdfjlksjfsfdskfjls",
         ISSUER: process.env.JWT_ISSUER || 'kosheli',
         TOKEN_TTL: process.env.JWT_TOKEN_TTL || "1d",
+    },
+    mail: {
+        api_key: process.env.SENDER_API_KEY || "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"
     }
 };
 exports.default = config;

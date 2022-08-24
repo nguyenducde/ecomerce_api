@@ -9,7 +9,7 @@
     "start": "node ./build/server.js",
     "seed": "ts-node ./src/data/seeder.ts",
     "destroy": "ts-node ./src/data/seeder.ts -d",
-    "build":"npm run build"
+    "build":"tsc"
   },
   "author": "Prajwal R.",
   "license": "ISC",
