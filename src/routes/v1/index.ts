@@ -8,7 +8,7 @@ const app = express();
 
 app.use("/auth", authRouter);
 
-app.use("/admin",  auth.hasRole(["admin"]), adminRouter);
+app.use("/admin", auth.verifyToken, auth.hasRole(["admin"]), adminRouter);
 
 app.use("/user", auth.verifyToken,  userRouter);
 
