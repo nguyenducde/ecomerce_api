@@ -64,7 +64,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use("/api", routes);
-app.use("/",async(req: Request, res: Response, next: NextFunction){
+app.use("/",async(req: Request, res: Response, next: NextFunction)=>{
   res.send("API running...");
 })
 
