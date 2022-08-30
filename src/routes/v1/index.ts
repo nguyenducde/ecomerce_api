@@ -3,6 +3,7 @@ import auth from "../../middlewares/auth";
 import authRouter from "./auth";
 import adminRouter from "./admin";
 import userRouter from "./user";
+import homeRouter from './home/homeRoutes'
 
 const app = express();
 
@@ -11,6 +12,8 @@ app.use("/auth", authRouter);
 app.use("/admin", auth.verifyToken, auth.hasRole(["admin"]), adminRouter);
 
 app.use("/user", auth.verifyToken,  userRouter);
+
+app.use("/home",homeRouter);
 
 // Logout
 

@@ -23,8 +23,7 @@ const login = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { email, password, panel } = req.body;
 
-    const user: any = await User.findOne({ email: email });
-
+    const user: any = await User.findOne({ email: email, role:panel });
     // Check User exists
     if (!user) {
       return res.status(404).send({
@@ -42,7 +41,7 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 
     // check the roles
     if (panel && panel == "admin") {
-      if (!user.role && user.role !== "admin") {
+      if (!user.role || user.role !== "admin") {
         return res.status(403).send({
           status: false,
           code: "UnauthorizedError",
@@ -50,6 +49,17 @@ const login = async (req: Request, res: Response): Promise<Response> => {
         });
       }
     }
+    
+      if (panel && panel == "user") {
+        if (!user.role || user.role !== "user") {
+          return res.status(403).send({
+            status: false,
+            code: "UnauthorizedError",
+            message: messages.login.notAdminRole,
+          });
+        }
+      }
+  
 
     // checking password validation;
     const passwordIsValid = bcryptjs.compareSync(password, user.password);
@@ -93,7 +103,6 @@ const changePassword = async (req: Request, res: Response): Promise<any> => {
         message: "Account not found.",
       });
     }
-    console.log(oldUser);
     const currentPasswordIsValid=bcryptjs.compareSync(currentPassword,oldUser.password);
     if(!currentPasswordIsValid){
       return res.status(409).json({status:false,message:"Current password does not match with old password."})
