@@ -6,36 +6,24 @@ import crypto from "crypto";
 
 import config from "../config";
 import User, { IUser } from "../models/user";
-const messages = {
-  login: {
-    noUserExists: "Account doesn't exists. Please register.",
-    noUserPassword: "Error with your account.Please contact administrator.",
-    notAdminRole: "User doesn't have enough permission.",
-    invalidPassword: "Invalid Credential. Please Try again.",
-    emailNotVerified:
-      "Your account is not verified yet. A new verification email has been sent. Please verify.",
-    success: "User logged in successfully.",
-    error: "Error logging in user. Please try again",
-  },
-};
 
 const login = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { email, password, panel } = req.body;
 
-    const user: any = await User.findOne({ email: email, role:panel });
+    const user: any = await User.findOne({ email: email, role: panel });
     // Check User exists
     if (!user) {
       return res.status(404).send({
         status: false,
-        message: messages.login.noUserExists,
+        message: "Account doesn't exists. Please register.",
       });
     }
     // Check password exists
     if (!user.password) {
       return res.status(409).send({
         status: false,
-        message: messages.login.noUserPassword,
+        message: "Error with your account.Please contact administrator.",
       });
     }
 
@@ -45,28 +33,27 @@ const login = async (req: Request, res: Response): Promise<Response> => {
         return res.status(403).send({
           status: false,
           code: "UnauthorizedError",
-          message: messages.login.notAdminRole,
+          message: "User doesn't have enough permission.",
         });
       }
     }
-    
-      if (panel && panel == "user") {
-        if (!user.role || user.role !== "user") {
-          return res.status(403).send({
-            status: false,
-            code: "UnauthorizedError",
-            message: messages.login.notAdminRole,
-          });
-        }
+
+    if (panel && panel == "user") {
+      if (!user.role || user.role !== "user") {
+        return res.status(403).send({
+          status: false,
+          code: "UnauthorizedError",
+          message: "User doesn't have enough permission.",
+        });
       }
-  
+    }
 
     // checking password validation;
     const passwordIsValid = bcryptjs.compareSync(password, user.password);
     if (!passwordIsValid) {
       return res.status(400).send({
         status: false,
-        message: messages.login.invalidPassword,
+        message: "Invalid Credential. Please Try again.",
       });
     }
 
@@ -81,15 +68,63 @@ const login = async (req: Request, res: Response): Promise<Response> => {
     delete resUser.password;
     return res.status(200).send({
       status: true,
-      message: messages.login.success,
+      message: "User logged in successfully.",
       accessToken: token,
       user: resUser,
     });
   } catch (error) {
     return res.status(400).send({
       status: false,
-      message: messages.login.error,
+      message: "Error logging in user. Please try again",
     });
+  }
+};
+
+const register = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { name, email, password, confirmPassword } = req.body;
+    const user_exist = await User.findOne({ email: email });
+
+    if (user_exist) {
+      return res.status(409).send({
+        status: false,
+        message: "User already exists with this email.",
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(401).send({
+        status: false,
+        message: "Password does not match. please try again.",
+      });
+    }
+
+    const user = await User.create({
+      name: name,
+      email: email,
+      password: bcryptjs.hashSync(password),
+    });
+
+    const token = jwt.sign({ id: user._id }, config.jwt.SECRET, {
+      expiresIn: config.jwt.TOKEN_TTL,
+      issuer: config.jwt.ISSUER,
+    });
+
+    const resUser = user.toObject();
+    delete resUser.password;
+    return res.status(200).send({
+      status: true,
+      message: "Successfully created account",
+      accessToken: token,
+      user: resUser,
+    });
+  } catch (e) {
+    return res
+      .status(400)
+      .send({
+        status: false,
+        message: "Something went wrong while registering user.",
+      });
   }
 };
 
@@ -103,20 +138,24 @@ const changePassword = async (req: Request, res: Response): Promise<any> => {
         message: "Account not found.",
       });
     }
-    const currentPasswordIsValid=bcryptjs.compareSync(currentPassword,oldUser.password);
-    if(!currentPasswordIsValid){
-      return res.status(409).json({status:false,message:"Current password does not match with old password."})
-    }
-    
-    oldUser.password=bcryptjs.hashSync(newPassword);
-    await oldUser.save();
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "Password updated successfully.",
-        data: oldUser,
+    const currentPasswordIsValid = bcryptjs.compareSync(
+      currentPassword,
+      oldUser.password
+    );
+    if (!currentPasswordIsValid) {
+      return res.status(409).json({
+        status: false,
+        message: "Current password does not match with old password.",
       });
+    }
+
+    oldUser.password = bcryptjs.hashSync(newPassword);
+    await oldUser.save();
+    res.status(200).json({
+      status: true,
+      message: "Password updated successfully.",
+      data: oldUser,
+    });
     return;
   } catch (error) {
     res.status(400).json({
@@ -135,12 +174,10 @@ const profile = async (req: Request, res: Response): Promise<void> => {
       data: user,
     });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        status: false,
-        message: "Something went wrong while fetching profile.",
-      });
+    res.status(400).json({
+      status: false,
+      message: "Something went wrong while fetching profile.",
+    });
   }
 };
 
@@ -152,21 +189,17 @@ const profileUpdate = async (req: Request, res: Response): Promise<void> => {
       { name, phone, address },
       { new: true }
     );
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "Account successfully updated.",
-        data: user,
-      });
+    res.status(200).json({
+      status: true,
+      message: "Account successfully updated.",
+      data: user,
+    });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        status: false,
-        message: "Something went wrong while updating account.",
-      });
+    res.status(400).json({
+      status: false,
+      message: "Something went wrong while updating account.",
+    });
   }
 };
 
-export = { login, changePassword, profile ,profileUpdate};
+export = { login,register, changePassword, profile, profileUpdate };

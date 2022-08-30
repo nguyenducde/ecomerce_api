@@ -7,6 +7,8 @@ const router=Router();
 
 router.post("/login",validator.loginValidator,validate,authController.login);
 
+router.post("/register",validator.registerValidator,validate,authController.register)
+
 router.get("/profile",auth.verifyToken,authController.profile);
 
 router.patch("/profile/:id",authController.profileUpdate)

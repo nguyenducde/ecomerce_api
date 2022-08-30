@@ -17,10 +17,14 @@ const validator = {
       .exists()
       .not()
       .isEmpty()
-      .withMessage("Name is required.")
-      .isString()
-      .isLength({ min: 2, max: 20 })
-      .withMessage("Password must be at least 2 characters"),
+      .withMessage("Name is required."),
+      body("email")
+      .exists()
+      .not()
+      .isEmpty()
+      .withMessage("Email field is required.")
+      .isEmail()
+      .withMessage("Email must be a valid email address")
   ],
   
   validate:(req: Request, res: Response,next: NextFunction):void=>{
