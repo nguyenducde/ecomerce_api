@@ -105,11 +105,11 @@ const register = async (req: Request, res: Response): Promise<Response> => {
       password: bcryptjs.hashSync(password),
     });
 
+  
     const token = jwt.sign({ id: user._id }, config.jwt.SECRET, {
       expiresIn: config.jwt.TOKEN_TTL,
       issuer: config.jwt.ISSUER,
     });
-
     const resUser = user.toObject();
     delete resUser.password;
     return res.status(200).send({

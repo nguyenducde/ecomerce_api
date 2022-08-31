@@ -12,6 +12,8 @@ router.get('/top-products', homeController.getTopProducts);
 
 router.get("/general-settings", homeController.generalSettings);
 
+router.get("/product/:id",homeController.getProductDetails)
+
 
 
 export default router;

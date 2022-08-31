@@ -85,10 +85,29 @@ const generalSettings= async(req: Request, res: Response): Promise<void>=>{
         }
 }
 
+const getProductDetails = async(req: Request, res: Response): Promise<void>=>{
+  try{
+    
+    let product=await Product.findOne({ _id:req.params.id});
+    res.status(200).send({
+      status: true,
+      data: product,
+      message: "Successfully fetched product.",
+    });
+  }
+  catch (error) {
+    res.status(400).send({
+      status: false,
+      message: "Something went wrong.",
+    });
+  }
+}
+
 export ={
     getSliders,
     getCategories,
     getBrands,
     generalSettings,
     getTopProducts,
+    getProductDetails,
 }

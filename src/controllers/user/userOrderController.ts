@@ -20,21 +20,22 @@ const getMyOrder= async (req: Request, res: Response): Promise<void>=>{
 }
 const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
     try{
-        const {shippingAddress,paymentMethod,note,cart}= req.body;
+        const {orderId,customerId,shippingPrice,discount,totalPrice,shippingAddress,paymentMethod,note,cart}= req.body;
         
-        const user=req.user as IUser;
+        // const user=req.user as IUser;
         const user_cart=cart;
+        const taxPrice=0;
         
         // const shippingAddr=await ShippingAddress.findOne({
         //     _id:shippingAddress,
         //     user:user,
         // });
         const shippingAddr={
-            user:"62ff2f3458f8c0e4b86ec414",
-            country:"Nepal",
-            address:"Pepsicola Kathmandu",
-            phone:"98182232243",
-            postalCode:"44600",
+            user:customerId,
+            country:shippingAddress.country,
+            address:shippingAddress.address,
+            phone:shippingAddress.phone,
+            postalCode:shippingAddress.postalCode,
             name:"home",
         }
         
@@ -42,8 +43,8 @@ const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
         
         if(user_cart && user_cart.length>0){
             for (const item of user_cart){
-                const {product:{_id,name,description,price,image},quantity}=item;
-                const orderItem=await OrderItem.create({name,description,price,image,product:{_id},quantity});
+                const {id,name,priceAfterDiscount,image,quantity}=item;
+                const orderItem=await OrderItem.create({name,price:priceAfterDiscount,image,product:{id},quantity});
                 orderItems.push(orderItem)
             }
         }
@@ -57,17 +58,11 @@ const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
         
         const orderPrice=orderItems.reduce((acc,item)=>acc+Math.floor(Number(item.price))* Math.floor(Number(item.quantity)),0);
         
-        const taxPrice=0;
         
-        const discount=0;
-        
-        const shippingPrice= constants.default.shipping_price;
-        
-        const totalPrice=Math.floor(Number(+orderPrice + +taxPrice - +discount));
         
         const order=await Order.create({
-            orderID:Math.floor(Math.random()*100000000),
-            user:user?.id,
+            orderID:orderId,
+            user:customerId,
             orderItems,
             shippingAddress:{
                 country:shippingAddr.country,
@@ -88,7 +83,7 @@ const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
         });
         
         if(order && order._id){
-            await User.findByIdAndUpdate(user?.id,{
+            await User.findByIdAndUpdate(customerId,{
                 $set:{
                     cart:[],
                 },
