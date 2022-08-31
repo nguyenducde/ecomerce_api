@@ -65,11 +65,8 @@ const adminValidator = {
       .exists()
       .not()
       .isEmpty()
-      .withMessage("Brand name is required.")
-      .isString()
-      .isLength({ min: 2 })
-      .withMessage("Brand name must be at least 2 characters"),
-    body("logo").isEmpty().exists().not().withMessage("Logo file is required."),
+      .withMessage("Brand name is required."),
+     
     body("status")
       .exists()
       .not()

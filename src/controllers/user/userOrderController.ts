@@ -44,7 +44,7 @@ const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
         if(user_cart && user_cart.length>0){
             for (const item of user_cart){
                 const {id,name,priceAfterDiscount,image,quantity}=item;
-                const orderItem=await OrderItem.create({name,price:priceAfterDiscount,image,product:{id},quantity});
+                const orderItem=await OrderItem.create({name,price:priceAfterDiscount,image,product:{_id:id},quantity});
                 orderItems.push(orderItem)
             }
         }
