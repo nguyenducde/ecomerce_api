@@ -68,7 +68,7 @@ const login = async (req: Request, res: Response): Promise<Response> => {
     delete resUser.password;
     return res.status(200).send({
       status: true,
-      message: "User logged in successfully.",
+      message: "Successfully login.",
       accessToken: token,
       user: resUser,
     });
