@@ -22,7 +22,7 @@ const orderSchema=new Schema({
     },
     paymentMethod:{
         type:String,
-        enum:["cod","esewa","paypal"],
+        enum:["cod","esewa","paypal","stripe"],
         default:"cod"
     },
     orderStatus:{

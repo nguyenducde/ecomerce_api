@@ -25,7 +25,7 @@ const getDashboardWidget = async (
       {
         $match: {
           paymentStatus: "paid",
-          orderStatus: "delivered"
+          // orderStatus: "delivered"
         },
       },
       {

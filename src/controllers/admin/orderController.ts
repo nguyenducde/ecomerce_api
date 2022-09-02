@@ -81,7 +81,7 @@ const updateOrder = async (req: Request, res: Response): Promise<void> => {
     if (prevOrder?.paymentStatus !== "paid" && orderStatus === "delivered") {
       const paidAt = new Date();
       const paymentStatus = "paid";
-      const paymentMethod = "cod";
+      // const paymentMethod = "cod";
 
       // here product data updates after successfully delivered
       const { orderItems } = prevOrder;
@@ -134,7 +134,7 @@ const updateOrder = async (req: Request, res: Response): Promise<void> => {
       const order = await (
         await Order.findByIdAndUpdate(
           req.params.id,
-          { paidAt, paymentMethod, paymentStatus, orderStatus },
+          { paidAt, paymentStatus, orderStatus },
           { new: true }
         )
       ).populate("user", "_id name email phone");

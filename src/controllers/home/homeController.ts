@@ -37,6 +37,22 @@ const getCategories= async(req: Request, res: Response): Promise<void>=>{
         }
 }
 
+const getCategoryByID= async(req: Request, res: Response): Promise<void>=>{
+  try{
+      const category=await Category.findOne({"_id":req.params.id});
+      res.status(200).send({
+          status: true,
+          data: category,
+          message: "Successfully retrieved category.",
+        });
+      } catch (error) {
+        res.status(400).send({
+          status: false,
+          message: "Something went wrong on categories.",
+        });
+      }
+}
+
 const getBrands= async(req: Request, res: Response): Promise<void>=>{
     try{
         const brands=await Brand.find({'status':"active"}).sort({"_id":-1});
@@ -69,6 +85,25 @@ const getTopProducts= async(req: Request, res: Response): Promise<void>=>{
         }
 }
 
+// Get Products by CategoryID
+const getProductsByCatId= async (req: Request, res: Response): Promise<void> => {
+  try{
+    const products= await Product.find({"status":"active","category":req.params.id}).sort({"id":-1}).populate("category", "_id name")
+    .populate("subcategory", "_id name")
+    .populate("brand", "_id name")
+    .lean();
+    res.status(200).json({
+      status:true,message:"successfully fetched the products based on category",data:products
+    })
+  }
+  catch(e){
+    res.status(400).json({
+      status: false,
+      message: "Something went wrong.",
+    });
+  }
+}
+
 const generalSettings= async(req: Request, res: Response): Promise<void>=>{
     try{
         const settings=await Settings.findOne();
@@ -88,7 +123,11 @@ const generalSettings= async(req: Request, res: Response): Promise<void>=>{
 const getProductDetails = async(req: Request, res: Response): Promise<void>=>{
   try{
     
-    let product=await Product.findOne({ _id:req.params.id});
+    let product=await Product.findOne({ _id:req.params.id})
+    .populate("category", "_id name")
+    .populate("subcategory", "_id name")
+    .populate("brand", "_id name")
+    .lean();
     res.status(200).send({
       status: true,
       data: product,
@@ -106,8 +145,11 @@ const getProductDetails = async(req: Request, res: Response): Promise<void>=>{
 export ={
     getSliders,
     getCategories,
+    getCategoryByID,
     getBrands,
     generalSettings,
     getTopProducts,
     getProductDetails,
+  getProductsByCatId,
+    
 }

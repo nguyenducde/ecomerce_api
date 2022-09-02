@@ -102,6 +102,7 @@ const register = async (req: Request, res: Response): Promise<Response> => {
     const user = await User.create({
       name: name,
       email: email,
+      status:'active',
       password: bcryptjs.hashSync(password),
     });
 

@@ -25,6 +25,11 @@ const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
         // const user=req.user as IUser;
         const user_cart=cart;
         const taxPrice=0;
+        let paymentStatus="unpaid";
+        
+        if(paymentMethod==="stripe"){
+            paymentStatus="paid";
+        }
         
         // const shippingAddr=await ShippingAddress.findOne({
         //     _id:shippingAddress,
@@ -78,7 +83,7 @@ const placeOrder= async (req: Request, res: Response): Promise<Response>=>{
             orderPrice,
             totalPrice,
             note,
-            paymentStatus:"unpaid",
+            paymentStatus:paymentStatus,
             orderStatus:"pending",
         });
         

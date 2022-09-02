@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/products",productController.getProducts)
 
+
 router.post("/product",adminValidator.addProductValidator,validate,productController.addProduct)
 
 router.patch("/product/:id",adminValidator.addCategoryValidator,validate,productController.updateProduct)
