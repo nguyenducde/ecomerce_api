@@ -6,6 +6,7 @@ import crypto from "crypto";
 
 import config from "../config";
 import User, { IUser } from "../models/user";
+import Settings from "../models/settings";
 
 const login = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -66,6 +67,16 @@ const login = async (req: Request, res: Response): Promise<Response> => {
     // response user;
     const resUser = user.toObject();
     delete resUser.password;
+    
+    
+    
+    // update visitors
+    await Settings.updateOne({
+      $inc:{
+        visitors:1
+      }
+    })
+    
     return res.status(200).send({
       status: true,
       message: "Successfully login.",

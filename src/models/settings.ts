@@ -28,6 +28,10 @@ const settingsSchema=new Schema({
     instagramUrl:String,
     linkedinUrl:String,
     twitterUrl:String,
+    visitors:{
+        type:Number,
+        default:0,
+    },
 })
 
 export interface ISettings extends Document{
@@ -45,6 +49,7 @@ export interface ISettings extends Document{
     instagramUrl?:string,
     twitterUrl?:string,
     linkedinUrl?:string,
+    visitors?:number,
 }
 
 const settings=mongoose.model<ISettings>("Settings",settingsSchema)
