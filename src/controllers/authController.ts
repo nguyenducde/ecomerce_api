@@ -94,6 +94,7 @@ const login = async (req: Request, res: Response): Promise<Response> => {
 const register = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { name, email, password, confirmPassword } = req.body;
+    console.log(req.body)
     const user_exist = await User.findOne({ email: email });
 
     if (user_exist) {
