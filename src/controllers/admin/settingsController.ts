@@ -4,6 +4,7 @@ import Settings from '../../models/settings';
 const getSettings= async (req: Request, res: Response): Promise<void> => {
     try{
         const settings = await Settings.findOne();
+        
         if(settings){
             res.status(200).json({
                 status:true,message:'Successfully fetched.',data:settings
