@@ -80,7 +80,7 @@ const deleteUser = async (req: Request, res: Response): Promise<any> => {
         console.log(err);
       }
       return res
-        .status(200)
+        .status(200) 
         .json({
           status: true,
           data: user,

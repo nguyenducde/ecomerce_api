@@ -132,11 +132,12 @@ const register = async (req: Request, res: Response): Promise<Response> => {
       user: resUser,
     });
   } catch (e) {
+    console.log(e)
     return res
       .status(400)
       .send({
         status: false,
-        message: "Something went wrong while registering user.",
+        message: e,
       });
   }
 };
